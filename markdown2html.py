@@ -21,6 +21,11 @@ def parse_markdown_heading(line):
     return f"<h{count}>{line.strip('# ').strip()}</h{count}>\n"
 
 
+def parse_markdown_unordered_list(line):
+    """Parse Markdown unordered list syntax and generate corresponding HTML."""
+    return f"<li>{line.strip('-* ').strip()}</li>\n"
+
+
 def main():
     """Converts a markdown file to HTML.
 
@@ -51,11 +56,28 @@ def main():
         markdown_lines = f.readlines()
 
     html_lines = []
+    in_list = False
     for line in markdown_lines:
-        if line.startswith('#'):
+        if line.startswith('-') or line.startswith('*'):
+            if not in_list:
+                html_lines.append("<ul>\n")
+                in_list = True
+            html_lines.append(parse_markdown_unordered_list(line))
+        elif line.startswith('#'):
+            if in_list:
+
+                html_lines.append("</ul>\n")
+                in_list = False
             html_lines.append(parse_markdown_heading(line))
         else:
+            if in_list:
+                html_lines.append("</ul>\n")
+                in_list = False
             html_lines.append(markdown.markdown(line))
+
+        # Close list if it's still open
+        if in_list:
+            html_lines.append("</ul>\n")
 
     # Writing the HTML content to the output file
     with open(output_file, 'w') as f:
