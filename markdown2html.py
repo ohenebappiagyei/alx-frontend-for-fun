@@ -61,14 +61,16 @@ def main():
         markdown_lines = f.readlines()
 
     html_lines = []
-    in_list = False  # Track whether we're currently inside a list
-    list_type = None  # Keep track of the current list type (unordered or ordered)
+    in_list = False
+    list_type = None
 
     for line in markdown_lines:
-        if line.startswith('-') or line.startswith('*') or (line[0].isdigit() and line[1] == '.'):
+        if line.startswith('-') or line.startswith('*') or \
+                (line[0].isdigit() and line[1] == '.'):
             # List item start
             if not in_list:
-                if line.startswith('* ') or (line[0].isdigit() and line[1] == '.'):
+                if line.startswith('* ') or \
+                        (line[0].isdigit() and line[1] == '.'):
                     html_lines.append("<ol>\n")
                     list_type = 'ordered'
                 else:
