@@ -26,6 +26,11 @@ def parse_markdown_unordered_list(line):
     return f"<li>{line.strip('-* ').strip()}</li>\n"
 
 
+def parse_markdown_ordered_list(line):
+    """Parse Markdown ordered list syntax and generate corresponding HTML."""
+    return f"<li>{line.strip('* ').strip()}</li>\n"
+
+
 def main():
     """Converts a markdown file to HTML.
 
@@ -56,28 +61,53 @@ def main():
         markdown_lines = f.readlines()
 
     html_lines = []
-    in_list = False
-    for line in markdown_lines:
-        if line.startswith('-') or line.startswith('*'):
-            if not in_list:
-                html_lines.append("<ul>\n")
-                in_list = True
-            html_lines.append(parse_markdown_unordered_list(line))
-        elif line.startswith('#'):
-            if in_list:
+    in_list = False  # Track whether we're currently inside a list
+    list_type = None  # Keep track of the current list type (unordered or ordered)
 
-                html_lines.append("</ul>\n")
+    for line in markdown_lines:
+        if line.startswith('-') or line.startswith('*') or (line[0].isdigit() and line[1] == '.'):
+            # List item start
+            if not in_list:
+                if line.startswith('* ') or (line[0].isdigit() and line[1] == '.'):
+                    html_lines.append("<ol>\n")
+                    list_type = 'ordered'
+                else:
+                    html_lines.append("<ul>\n")
+                    list_type = 'unordered'
+                in_list = True
+            if line.startswith('* '):  # Check for the space after the asterisk
+                html_lines.append(parse_markdown_ordered_list(line))
+            else:
+                html_lines.append(parse_markdown_unordered_list(line))
+        elif line.startswith('#'):
+            # Heading
+            if in_list:
+                # Close the previous list if it's open
+                if list_type == 'unordered':
+                    html_lines.append("</ul>\n")
+                elif list_type == 'ordered':
+                    html_lines.append("</ol>\n")
                 in_list = False
+                list_type = None
             html_lines.append(parse_markdown_heading(line))
         else:
+            # Other elements (paragraph, etc.)
             if in_list:
-                html_lines.append("</ul>\n")
+                # Close the previous list if it's open
+                if list_type == 'unordered':
+                    html_lines.append("</ul>\n")
+                elif list_type == 'ordered':
+                    html_lines.append("</ol>\n")
                 in_list = False
+                list_type = None
             html_lines.append(markdown.markdown(line))
 
-        # Close list if it's still open
-        if in_list:
+    # Close any list that might still be open at the end
+    if in_list:
+        if list_type == 'unordered':
             html_lines.append("</ul>\n")
+        elif list_type == 'ordered':
+            html_lines.append("</ol>\n")
 
     # Writing the HTML content to the output file
     with open(output_file, 'w') as f:
