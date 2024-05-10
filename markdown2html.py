@@ -63,11 +63,15 @@ def main():
     html_lines = []
     in_list = False
     list_type = None
+    in_paragraph = False
 
     for line in markdown_lines:
         if line.startswith('-') or line.startswith('*') or \
                 (line[0].isdigit() and line[1] == '.'):
             # List item start
+            if in_paragraph:
+                html_lines.append("</p>\n")
+                in_paragraph = False
             if not in_list:
                 if line.startswith('* ') or \
                         (line[0].isdigit() and line[1] == '.'):
@@ -83,6 +87,9 @@ def main():
                 html_lines.append(parse_markdown_unordered_list(line))
         elif line.startswith('#'):
             # Heading
+            if in_paragraph:
+                html_lines.append("</p>\n")
+                in_paragraph = False
             if in_list:
                 # Close the previous list if it's open
                 if list_type == 'unordered':
@@ -92,24 +99,32 @@ def main():
                 in_list = False
                 list_type = None
             html_lines.append(parse_markdown_heading(line))
+        elif line.strip() == '':
+            # Empty line, end of paragraph
+            if in_paragraph:
+                html_lines.append("</p>\n")
+                in_paragraph = False
         else:
-            # Other elements (paragraph, etc.)
-            if in_list:
-                # Close the previous list if it's open
-                if list_type == 'unordered':
-                    html_lines.append("</ul>\n")
-                elif list_type == 'ordered':
-                    html_lines.append("</ol>\n")
-                in_list = False
-                list_type = None
-            html_lines.append(markdown.markdown(line))
+            # Paragraph
+            if not in_paragraph:
+                html_lines.append("<p>\n")
+                in_paragraph = True
+            html_lines.append(line.strip())
 
-    # Close any list that might still be open at the end
+            # Check if there is content in the next line or it's 
+            # the last line of the document
+            next_line_index = markdown_lines.index(line) + 1
+            if next_line_index < len(markdown_lines) and markdown_lines[next_line_index].strip() != '':
+                html_lines.append("<br/>\n")
+
+    # Close any list or paragraph that might still be open at the end
     if in_list:
         if list_type == 'unordered':
             html_lines.append("</ul>\n")
         elif list_type == 'ordered':
             html_lines.append("</ol>\n")
+    if in_paragraph:
+        html_lines.append("</p>\n")
 
     # Writing the HTML content to the output file
     with open(output_file, 'w') as f:
