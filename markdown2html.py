@@ -109,7 +109,7 @@ def main():
             if not in_paragraph:
                 html_lines.append("<p>\n")
                 in_paragraph = True
-            html_lines.append(line.strip())
+            html_lines.append(line.strip() + "\n")
 
             # Check if there is content in the next line or it's 
             # the last line of the document
