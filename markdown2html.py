@@ -120,7 +120,8 @@ def main():
             html_lines.append(line.strip() + "\n")
 
             # Check if it's not the last line of the paragraph
-            if line != markdown_lines[-1]:
+            next_line_index = markdown_lines.index(line) + 1
+            if next_line_index < len(markdown_lines) and markdown_lines[next_line_index].strip() != '':
                 html_lines.append("<br/>\n")
 
             # Close any paragraph that might still be open at the end
