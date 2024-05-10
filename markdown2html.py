@@ -20,12 +20,12 @@ def parse_markdown_heading(line):
 
 def parse_markdown_unordered_list(line):
     """Parse Markdown unordered list syntax and generate corresponding HTML."""
-    return f"<li>{parse_bold_and_emphasis(line.strip('-* ').strip())}</li>\n"
+    return f"<li>{parse_bold_and_emphasis(line).strip('-* ').strip()}</li>\n"
 
 
 def parse_markdown_ordered_list(line):
     """Parse Markdown ordered list syntax and generate corresponding HTML."""
-    return f"<li>{parse_bold_and_emphasis(line.strip('* ').strip())}</li>\n"
+    return f"<li>{parse_bold_and_emphasis(line).strip('* ').strip()}</li>\n"
 
 
 def parse_bold_and_emphasis(text):
