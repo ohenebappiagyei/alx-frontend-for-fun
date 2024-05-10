@@ -107,24 +107,25 @@ def main():
         else:
             # Paragraph
             if not in_paragraph:
+                if in_list:
+                    # Close the list if it's open before starting a paragraph
+                    if list_type == 'unordered':
+                        html_lines.append("</ul>\n")
+                    elif list_type == 'ordered':
+                        html_lines.append("</ol>\n")
+                    in_list = False
+                    list_type = None
                 html_lines.append("<p>\n")
                 in_paragraph = True
             html_lines.append(line.strip() + "\n")
 
-            # Check if there is content in the next line or it's 
-            # the last line of the document
-            next_line_index = markdown_lines.index(line) + 1
-            if next_line_index < len(markdown_lines) and markdown_lines[next_line_index].strip() != '':
+            # Check if it's not the last line of the paragraph
+            if line != markdown_lines[-1]:
                 html_lines.append("<br/>\n")
 
-    # Close any list or paragraph that might still be open at the end
-    if in_list:
-        if list_type == 'unordered':
-            html_lines.append("</ul>\n")
-        elif list_type == 'ordered':
-            html_lines.append("</ol>\n")
-    if in_paragraph:
-        html_lines.append("</p>\n")
+            # Close any paragraph that might still be open at the end
+            if in_paragraph:
+                html_lines.append("</p>\n")
 
     # Writing the HTML content to the output file
     with open(output_file, 'w') as f:
