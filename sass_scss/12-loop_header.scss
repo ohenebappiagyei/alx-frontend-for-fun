@@ -1,0 +1,7 @@
+/* Task: Create h1 to h5 tags with font sizes from 1px to 5px using @for statement */
+
+@for $i from 1 through 5 {
+  h#{$i} {
+    font-size: #{$i}px;
+  }
+}
