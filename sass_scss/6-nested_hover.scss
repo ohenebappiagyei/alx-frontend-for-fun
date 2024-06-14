@@ -1,0 +1,11 @@
+/* Task: Assign text color #FF0000 to button tags,
+   and change text color to #00FF00 when the user hovers over button tags using nested declarations */
+
+button {
+  color: #FF0000;
+
+  &:hover {
+    color: #00FF00;
+  }
+}
+
