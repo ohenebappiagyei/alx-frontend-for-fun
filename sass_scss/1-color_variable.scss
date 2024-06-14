@@ -1,0 +1,10 @@
+/* Task: Assign the text color #3D3D3D to the HTML tags body and p using a Sass variable */
+$text-color: #3D3D3D;
+
+body {
+	color: $text-color;
+}
+
+p {
+	color: $text-color;
+}
